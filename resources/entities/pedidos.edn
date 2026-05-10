@@ -1,0 +1,43 @@
+{:entity :pedidos
+ :title "Pedidos"
+ :table "pedidos"
+ :connection :default
+ :rights ["A" "S"]
+ :mode :parameter-driven
+ :menu-category :Operacion
+ :menu-icon "bi bi-receipt"
+ :dropdown-icon "bi bi-receipt"
+
+ :fields [{:id :id            :label "ID"           :type :hidden}
+          {:id :cliente_id    :label "Cliente"       :type :hidden}
+          {:id :repartidor_id :label "Repartidor"    :type :hidden}
+          {:id :tipo          :label "Tipo"          :type :select
+           :options [{:value "domicilio" :label "Domicilio"}
+                     {:value "recoger"   :label "Recoger en tienda"}]}
+          {:id :status        :label "Estado"        :type :select
+           :options [{:value "nuevo"      :label "Nuevo"}
+                     {:value "preparando" :label "Preparando"}
+                     {:value "listo"      :label "Listo"}
+                     {:value "en_ruta"    :label "En Ruta"}
+                     {:value "entregado"  :label "Entregado"}
+                     {:value "cancelado"  :label "Cancelado"}]}
+          {:id :total    :label "Total $"    :type :number}
+          {:id :paga_con :label "Paga con $" :type :number}
+          {:id :cambio   :label "Cambio $"   :type :number}
+          {:id :notas    :label "Notas"      :type :textarea :placeholder "Instrucciones especiales..."}
+          {:id :created_at :label "Fecha" :type :text}]
+
+ :queries {:list "SELECT p.*, c.nombre as cliente_nombre, r.nombre as repartidor_nombre
+                 FROM pedidos p
+                 JOIN clientes c ON p.cliente_id = c.id
+                 LEFT JOIN repartidores r ON p.repartidor_id = r.id
+                 ORDER BY p.id DESC"
+           :get  "SELECT * FROM pedidos WHERE id = ?"}
+
+ :actions {:new false :edit true :delete false}
+
+ :subgrids [{:entity :pedido_detalle
+             :title "Detalle del Pedido"
+             :foreign-key :pedido_id
+             :icon "bi bi-list-ul"
+             :label "Productos"}]}

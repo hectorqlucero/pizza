@@ -7,7 +7,7 @@
   (list
    [:div.container.mt-5
     [:div.text-center
-     [:h1.text-info "My Site Title"]
+     [:h1.text-info "Mi Pizzeria Chicalona"]
      [:p.text-muted "Serving the community since 2003"]
      [:p "123 New Lane, Industrial City, CA 90210"]
      [:p "Phone: (686) 123-4567 | Email: contactlhc@lhc.com"]]]))

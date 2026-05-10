@@ -1,0 +1,27 @@
+{:entity :clientes
+ :title "Clientes"
+ :table "clientes"
+ :connection :default
+ :rights ["U" "A" "S"]
+ :mode :parameter-driven
+ :menu-category :Catalogos
+ :menu-icon "bi bi-people"
+ :dropdown-icon "bi bi-people"
+
+ :fields [{:id :id        :label "ID"           :type :hidden}
+          {:id :nombre    :label "Nombre"        :type :text  :placeholder "Nombre completo..."}
+          {:id :telefono  :label "Teléfono"      :type :text  :placeholder "686-123-4567"}
+          {:id :calle     :label "Calle y #"     :type :text  :placeholder "Av. Juárez 123"}
+          {:id :colonia   :label "Colonia"       :type :text  :placeholder "Colonia..."}
+          {:id :municipio :label "Municipio"     :type :text  :placeholder "Mexicali..."}
+          {:id :referencias :label "Referencias" :type :textarea :placeholder "Frente a la farmacia, portón azul..."}
+          {:id :activo    :label "Activo"        :type :radio :value "T"
+           :options [{:id "activoT" :value "T" :label "Sí"}
+                     {:id "activoF" :value "F" :label "No"}]}]
+
+ :queries {:list "SELECT * FROM clientes ORDER BY nombre ASC"
+           :get  "SELECT * FROM clientes WHERE id = ?"}
+
+ :actions {:new true :edit true :delete true}
+
+ :hooks {:before-save :pizza.hooks.clientes/before-save}}

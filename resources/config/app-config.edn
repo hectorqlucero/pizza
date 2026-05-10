@@ -88,8 +88,8 @@
 
  ;; --- Application Settings ---
  :uploads      "./uploads/pizza/"
- :site-name    "change_me"
- :company-name "change_me"
+ :site-name    "Pizza"
+ :company-name "Pescasoft Software"
  :port         3000
  :tz           "US/Pacific"
  :base-url     "http://localhost:3000/"

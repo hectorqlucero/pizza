@@ -1,0 +1,23 @@
+{:entity :pedido_detalle
+ :title "Detalle Pedido"
+ :table "pedido_detalle"
+ :connection :default
+ :rights ["A" "S"]
+ :mode :parameter-driven
+ :menu-hidden? true
+
+ :fields [{:id :id              :label "ID"          :type :hidden}
+          {:id :pedido_id       :label "Pedido ID"   :type :hidden}
+          {:id :producto_id     :label "Producto ID" :type :hidden}
+          {:id :cantidad        :label "Cantidad"    :type :number}
+          {:id :precio_unitario :label "Precio Unit" :type :number}
+          {:id :subtotal        :label "Subtotal"    :type :number}]
+
+ :queries {:list "SELECT pd.*, pr.nombre as producto_nombre
+                  FROM pedido_detalle pd
+                  JOIN productos pr ON pd.producto_id = pr.id
+                  WHERE pd.pedido_id = ?
+                  ORDER BY pd.id"
+           :get  "SELECT * FROM pedido_detalle WHERE id = ?"}
+
+ :actions {:new false :edit false :delete false}}

@@ -1,0 +1,26 @@
+{:entity :productos
+ :title "Productos"
+ :table "productos"
+ :connection :default
+ :rights ["A" "S"]
+ :mode :parameter-driven
+ :menu-category :Catalogos
+ :menu-icon "bi bi-cart"
+
+ :fields [{:id :id        :label "ID"        :type :hidden}
+          {:id :nombre    :label "Nombre"    :type :text   :placeholder "Nombre del producto..."}
+          {:id :categoria :label "Categoría" :type :select
+           :options [{:value ""        :label "Seleccionar..."}
+                     {:value "Pizza"   :label "Pizza"}
+                     {:value "Bebida"  :label "Bebida"}
+                     {:value "Extra"   :label "Extra"}
+                     {:value "Postre"  :label "Postre"}]}
+          {:id :precio    :label "Precio"    :type :number :placeholder "0.00"}
+          {:id :activo    :label "Activo"    :type :radio  :value "T"
+           :options [{:id "activoT" :value "T" :label "Sí"}
+                     {:id "activoF" :value "F" :label "No"}]}]
+
+ :queries {:list "SELECT * FROM productos ORDER BY categoria, nombre"
+           :get  "SELECT * FROM productos WHERE id = ?"}
+
+ :actions {:new true :edit true :delete true}}

@@ -1,0 +1,21 @@
+{:entity :repartidores
+ :title "Repartidores"
+ :table "repartidores"
+ :connection :default
+ :rights ["A" "S"]
+ :mode :parameter-driven
+ :menu-category :Catalogos
+ :menu-icon "bi bi-bicycle"
+ :dropdown-icon "bi bi-bicycle"
+
+ :fields [{:id :id       :label "ID"        :type :hidden}
+          {:id :nombre   :label "Nombre"    :type :text :placeholder "Nombre del repartidor..."}
+          {:id :telefono :label "Teléfono"  :type :text :placeholder "686-123-4567"}
+          {:id :activo   :label "Activo"    :type :radio :value "T"
+           :options [{:id "activoT" :value "T" :label "Sí"}
+                     {:id "activoF" :value "F" :label "No"}]}]
+
+ :queries {:list "SELECT * FROM repartidores ORDER BY nombre"
+           :get  "SELECT * FROM repartidores WHERE id = ?"}
+
+ :actions {:new true :edit true :delete true}}
