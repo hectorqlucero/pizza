@@ -4,7 +4,7 @@
    [ring.util.anti-forgery :refer [anti-forgery-field]]))
 
 ;; ---------------------------------------------------------------------------
-;; Phone search screen
+;; Pantalla de busqueda por telefono
 ;; ---------------------------------------------------------------------------
 
 (defn buscar-view []
@@ -31,7 +31,7 @@
           [:i.bi.bi-search.me-2] "Buscar"]]]]]]]])
 
 ;; ---------------------------------------------------------------------------
-;; Customer section
+;; Sección del Cliente
 ;; ---------------------------------------------------------------------------
 
 (defn- cliente-encontrado [cliente]
@@ -72,7 +72,7 @@
                             :placeholder "Frente a la farmacia, portón azul..."}]]]]])
 
 ;; ---------------------------------------------------------------------------
-;; Products grid grouped by category
+;; Grid de productos agrupados por categoria
 ;; ---------------------------------------------------------------------------
 
 (defn- producto-row [p]
@@ -104,7 +104,7 @@
          (map producto-row prods)]])]))
 
 ;; ---------------------------------------------------------------------------
-;; Full order form
+;; Forma de orden completa
 ;; ---------------------------------------------------------------------------
 
 (defn orden-view [{:keys [cliente telefono productos]}]
@@ -185,7 +185,7 @@
        [:i.bi.bi-arrow-left.me-1] "Nueva búsqueda"]]]))
 
 ;; ---------------------------------------------------------------------------
-;; Receipt
+;; Recibo
 ;; ---------------------------------------------------------------------------
 
 (defn recibo-view [pedido detalle]
@@ -243,7 +243,7 @@
         [:i.bi.bi-truck.me-1] "Ir a Despacho"]]]]))
 
 ;; ---------------------------------------------------------------------------
-;; JS: total + change calculator (inlined into page)
+;; JS: total + change calculador
 ;; ---------------------------------------------------------------------------
 
 (defn orden-js []

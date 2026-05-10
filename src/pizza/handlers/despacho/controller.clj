@@ -7,7 +7,7 @@
    [ring.util.response :refer [redirect]]))
 
 ;; ---------------------------------------------------------------------------
-;; GET /despacho  — dispatch board
+;; GET /despacho  — Tabla de Despacho
 ;; ---------------------------------------------------------------------------
 
 (defn main
@@ -20,7 +20,7 @@
                  (view/despacho-view pedidos repartidores))))
 
 ;; ---------------------------------------------------------------------------
-;; POST /despacho/status  — advance a single order's status
+;; POST /despacho/status  — avanzar el estatus de una orden
 ;; ---------------------------------------------------------------------------
 
 (defn cambiar-status
@@ -33,7 +33,7 @@
     (redirect "/despacho")))
 
 ;; ---------------------------------------------------------------------------
-;; POST /despacho/asignar  — assign checked orders to a driver
+;; POST /despacho/asignar  — assignar ordenes al repartidor
 ;; ---------------------------------------------------------------------------
 
 (defn asignar

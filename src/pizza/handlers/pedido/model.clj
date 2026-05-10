@@ -19,18 +19,18 @@
 ;; ---------------------------------------------------------------------------
 
 (defn buscar-por-telefono
-  "Returns the first active cliente matching the given phone number, or nil."
+  "Regresar el primer cliente activo por el telefono o nil."
   [telefono]
   (first (Query db ["SELECT * FROM clientes WHERE telefono = ? AND activo = 'T' LIMIT 1"
                     (normalize-tel telefono)])))
 
 (defn get-productos
-  "All active products ordered by category then name."
+  "Todos los productos activos sorteados por category y luego name."
   []
   (Query db ["SELECT * FROM productos WHERE activo = 'T' ORDER BY categoria, nombre"]))
 
 (defn get-recibo
-  "Returns {:pedido ... :detalle [...]} for the given pedido id."
+  "Regresa {:pedido ... :detalle [...]} para el id del pedido."
   [pedido-id]
   (let [pedido  (first (Query db ["SELECT p.*,
                                           c.nombre      AS cliente_nombre,
@@ -51,14 +51,14 @@
 ;; ---------------------------------------------------------------------------
 
 (defn crear-cliente!
-  "Insert a new cliente and return its new id."
+  "Insertar un nuevo cliente en la base de datos y regresar su nuevo id."
   [m]
   (j/with-db-transaction [t db]
     (j/insert! t :clientes (update m :telefono normalize-tel))
     (last-id t)))
 
 (defn guardar-pedido!
-  "Insert pedido + all detail lines in one transaction. Returns the new pedido id."
+  "Insertar pedido + todas las lineas de detalle en una transacción. Regresa el nuevo id."
   [cliente-id tipo notas paga-con total items]
   (j/with-db-transaction [t db]
     (j/insert! t :pedidos {:cliente_id    cliente-id

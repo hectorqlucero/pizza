@@ -16,7 +16,6 @@
  :queries {:list "SELECT pd.*, pr.nombre as producto_nombre
                   FROM pedido_detalle pd
                   JOIN productos pr ON pd.producto_id = pr.id
-                  WHERE pd.pedido_id = ?
                   ORDER BY pd.id"
            :get  "SELECT * FROM pedido_detalle WHERE id = ?"}
 

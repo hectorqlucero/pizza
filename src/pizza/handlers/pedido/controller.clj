@@ -18,7 +18,7 @@
   (try (Double/parseDouble (str s)) (catch Exception _ 0.0)))
 
 ;; ---------------------------------------------------------------------------
-;; GET /pedido  — phone search screen
+;; GET /pedido  — Busqueda por telefono
 ;; ---------------------------------------------------------------------------
 
 (defn buscar
@@ -28,7 +28,7 @@
     (application request title ok nil (view/buscar-view))))
 
 ;; ---------------------------------------------------------------------------
-;; POST /pedido/buscar  — look up customer by phone, show order form
+;; POST /pedido/buscar  — Busqueda por telefono y enseñar la forma de orden
 ;; ---------------------------------------------------------------------------
 
 (defn buscar-post
@@ -46,7 +46,7 @@
                                    :productos productos}))))
 
 ;; ---------------------------------------------------------------------------
-;; POST /pedido/guardar  — save order + lines, redirect to receipt
+;; POST /pedido/guardar  — Guardar la orden + lineas, redireccionar al recibo
 ;; ---------------------------------------------------------------------------
 
 (defn guardar
@@ -59,11 +59,11 @@
         notas     (or (:notas params) "")
         paga-con  (str->double (:paga_con params))
 
-        ;; Re-fetch prices server-side — never trust the client
+        ;; Agarrar los precios del servidor
         productos  (model/get-productos)
         precio-map (into {} (map (fn [p] [(:id p) (:precio p)]) productos))
 
-        ;; Collect qty-{id} params where qty > 0
+        ;; Coleccionar qty-{id} parameters donde qty > 0
         items (->> params
                    (filter (fn [[k _]] (str/starts-with? (name k) "qty-")))
                    (keep  (fn [[k v]]
@@ -93,7 +93,7 @@
         (redirect (str "/pedido/recibo/" pid))))))
 
 ;; ---------------------------------------------------------------------------
-;; GET /pedido/recibo/:id  — receipt / confirmation
+;; GET /pedido/recibo/:id  — recibo / confirmación
 ;; ---------------------------------------------------------------------------
 
 (defn recibo

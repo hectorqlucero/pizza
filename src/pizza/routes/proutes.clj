@@ -8,13 +8,13 @@
 ;; Add custom non-CRUD routes here if needed
 
 (defroutes proutes
-  ;; Pedido — phone-driven order entry
+  ;; Pedido — rutas
   (GET  "/pedido"            req (pedido/buscar req))
   (POST "/pedido/buscar"     req (pedido/buscar-post req))
   (POST "/pedido/guardar"    req (pedido/guardar req))
   (GET  "/pedido/recibo/:id" req (pedido/recibo req))
 
-  ;; Despacho — kitchen / driver dispatch board
+  ;; Despacho — Cocina / Repartidor tablero
   (GET  "/despacho"          req (despacho/main req))
   (POST "/despacho/status"   req (despacho/cambiar-status req))
   (POST "/despacho/asignar"  req (despacho/asignar req)))

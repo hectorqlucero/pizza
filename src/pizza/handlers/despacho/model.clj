@@ -5,7 +5,7 @@
 (def ^:private open-statuses "('nuevo','preparando','listo','en_ruta')")
 
 (defn get-pedidos-abiertos
-  "All non-closed orders with customer and driver names."
+  "Todas las ordenes no-cerradas con clientes y nombres de repartidores"
   []
   (Query db [(str "SELECT p.*,
                           c.nombre   AS cliente_nombre,
@@ -27,7 +27,7 @@
   (Update db :pedidos {:status status} ["id = ?" pedido-id]))
 
 (defn asignar!
-  "Move selected pedido-ids to en_ruta and assign the driver."
+  "Mover pedido-ids seleccionados a en_ruta y asignar el repartidor."
   [pedido-ids repartidor-id]
   (doseq [pid pedido-ids]
     (Update db :pedidos

@@ -29,13 +29,14 @@
    [:button.btn.btn-sm.btn-outline-danger {:type "submit"} "✕"]])
 
 ;; ---------------------------------------------------------------------------
-;; Individual order card
+;; card de orden Individual
 ;; ---------------------------------------------------------------------------
 
 (defn- order-card [p]
   (let [status       (:status p)
         {:keys [color next next-label]} (get status-cfg status {})
-        es-domicilio (= (:tipo p) "domicilio")]
+        es-domicilio (= (:tipo p) "domicilio")
+        es-recoger   (= (:tipo p) "recoger")]
     [:div.card.mb-2.shadow-sm
      {:class (str "border-" color)}
      [:div.card-body.py-2.px-3
@@ -59,6 +60,8 @@
       [:div.d-flex.gap-1.flex-wrap
        (when (and next next-label)
          (advance-btn (:id p) next next-label color))
+       (when (and es-recoger (= status "listo"))
+         (advance-btn (:id p) "entregado" "✓ Entregado" "success"))
        (when-not (#{"en_ruta" "entregado" "cancelado"} status)
          (cancel-btn (:id p)))
        (when (:repartidor_nombre p)
@@ -66,7 +69,7 @@
           [:i.bi.bi-bicycle.me-1] (:repartidor_nombre p)])]]]))
 
 ;; ---------------------------------------------------------------------------
-;; Dispatch form for "listo" orders
+;; Forma para despacho para ordenes "listo"
 ;; ---------------------------------------------------------------------------
 
 (defn- dispatch-form [listos repartidores]
@@ -100,7 +103,7 @@
           [:i.bi.bi-send.me-2] "Enviar ruta"]]]]]]))
 
 ;; ---------------------------------------------------------------------------
-;; Status column
+;; Status columna
 ;; ---------------------------------------------------------------------------
 
 (defn- status-column [label color orders]
@@ -115,21 +118,22 @@
        [:p.text-muted.text-center.small.mt-3 "Sin pedidos"])]]])
 
 ;; ---------------------------------------------------------------------------
-;; Main dispatch view
+;; Main despacho vista (view)
 ;; ---------------------------------------------------------------------------
 
 (defn despacho-view [pedidos repartidores]
-  (let [by-status  (group-by :status pedidos)
-        nuevo      (get by-status "nuevo"      [])
-        preparando (get by-status "preparando" [])
-        listo      (get by-status "listo"      [])
-        en-ruta    (get by-status "en_ruta"    [])]
+  (let [by-status       (group-by :status pedidos)
+        nuevo           (get by-status "nuevo"      [])
+        preparando      (get by-status "preparando" [])
+        listo           (get by-status "listo"      [])
+        en-ruta         (get by-status "en_ruta"    [])
+        listo-domicilio (filter #(= (:tipo %) "domicilio") listo)]
     [:div.container-fluid.mt-3
      [:div.d-flex.justify-content-between.align-items-center.mb-3
       [:h4.fw-bold [:i.bi.bi-truck.me-2] "Despacho"]
       [:a.btn.btn-outline-primary.btn-sm {:href "/pedido"}
        [:i.bi.bi-telephone.me-1] "Tomar Pedido"]]
-     (dispatch-form listo repartidores)
+     (dispatch-form listo-domicilio repartidores)
      [:div.row
       (status-column "Nuevos"     "danger"  nuevo)
       (status-column "Preparando" "warning" preparando)
