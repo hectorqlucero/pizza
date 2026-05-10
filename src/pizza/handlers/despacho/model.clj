@@ -2,6 +2,7 @@
   (:require
    [pizza.models.crud :refer [db Query Update]]))
 
+;;Aqui los estatus que son acceptados, es una variable privada, solo para usar en este namespace
 (def ^:private open-statuses "('nuevo','preparando','listo','en_ruta')")
 
 (defn get-pedidos-abiertos

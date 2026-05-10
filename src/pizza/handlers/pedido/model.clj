@@ -5,7 +5,7 @@
    [pizza.models.crud :refer [db Query]]))
 
 ;; ---------------------------------------------------------------------------
-;; Helpers
+;; Helpers - para facilitar agarrar el id de un record creado y normalizar los telefonos en la busqueda
 ;; ---------------------------------------------------------------------------
 
 (defn- normalize-tel [tel]
@@ -15,7 +15,7 @@
   (:id (first (j/query t-con ["SELECT last_insert_rowid() as id"]))))
 
 ;; ---------------------------------------------------------------------------
-;; Queries
+;; Queries base de datos - pueden cambiar si cambias a mysql/postgresql
 ;; ---------------------------------------------------------------------------
 
 (defn buscar-por-telefono
@@ -47,7 +47,7 @@
     {:pedido pedido :detalle detalle}))
 
 ;; ---------------------------------------------------------------------------
-;; Writes (single transaction)
+;; Escribir (transaction "single" unica?)
 ;; ---------------------------------------------------------------------------
 
 (defn crear-cliente!

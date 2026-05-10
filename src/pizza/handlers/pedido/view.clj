@@ -4,7 +4,7 @@
    [ring.util.anti-forgery :refer [anti-forgery-field]]))
 
 ;; ---------------------------------------------------------------------------
-;; Pantalla de busqueda por telefono
+;; Pantalla de busqueda por telefono - En una forma :action "/pedido/buscar" es la ruta
 ;; ---------------------------------------------------------------------------
 
 (defn buscar-view []
@@ -243,7 +243,7 @@
         [:i.bi.bi-truck.me-1] "Ir a Despacho"]]]]))
 
 ;; ---------------------------------------------------------------------------
-;; JS: total + change calculador
+;; JS: total + change calculador - calcular la feria del billete con lo que pago el cliente
 ;; ---------------------------------------------------------------------------
 
 (defn orden-js []

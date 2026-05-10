@@ -25,7 +25,7 @@
           {:id :paga_con :label "Paga con $" :type :number}
           {:id :cambio   :label "Cambio $"   :type :number}
           {:id :notas    :label "Notas"      :type :textarea :placeholder "Instrucciones especiales..."}
-          {:id :created_at :label "Fecha" :type :text}]
+          {:id :created_at :label "Fecha" :type :datetime}]
 
  :queries {:list "SELECT p.*, c.nombre as cliente_nombre, r.nombre as repartidor_nombre
                  FROM pedidos p

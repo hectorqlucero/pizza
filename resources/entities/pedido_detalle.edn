@@ -10,13 +10,26 @@
           {:id :pedido_id       :label "Pedido ID"   :type :hidden}
           {:id :producto_id     :label "Producto ID" :type :hidden}
           {:id :cantidad        :label "Cantidad"    :type :number}
-          {:id :precio_unitario :label "Precio Unit" :type :number}
-          {:id :subtotal        :label "Subtotal"    :type :number}]
+          {:id :precio_unitario :label "Precio Unit" :type :decimal :step 0.01 :placeholder "0.00" :hidden-in-grid? true}
+          {:id :precio_formatted :label "Precio" :grid-only? true}
+          {:id :subtotal        :label "Subtotal"    :type :decimal :step 0.01 :placeholder "0.00" :hidden-in-grid? true}
+          {:id :subtotal_formatted :label "Subtotal" :grid-only? true}]
 
- :queries {:list "SELECT pd.*, pr.nombre as producto_nombre
-                  FROM pedido_detalle pd
-                  JOIN productos pr ON pd.producto_id = pr.id
-                  ORDER BY pd.id"
-           :get  "SELECT * FROM pedido_detalle WHERE id = ?"}
+ :queries {:list "SELECT 
+                 pd.*, 
+                 printf('$%.2f',pd.precio_unitario) as precio_formatted,
+                 printf('$%.2f',pd.subtotal) as subtotal_formatted,
+                 pr.nombre as producto_nombre
+                 FROM pedido_detalle pd
+                 JOIN productos pr ON pd.producto_id = pr.id
+                 ORDER BY pd.id"
+           :get  "SELECT 
+                 pd.*, 
+                 printf('$%.2f',pd.precio_unitario) as precio_formatted,
+                 printf('$%.2f',pd.subtotal) as subtotal_formatted,
+                 pr.nombre as producto_nombre
+                 FROM pedido_detalle pd
+                 JOIN productos pr ON pd.producto_id = pr.id
+                 WHERE pd.id = ?"}
 
- :actions {:new false :edit false :delete false}}
+ :actions {:new true :edit true :delete false}}

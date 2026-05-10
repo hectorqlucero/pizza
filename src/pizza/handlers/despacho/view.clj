@@ -4,7 +4,7 @@
    [ring.util.anti-forgery :refer [anti-forgery-field]]))
 
 ;; ---------------------------------------------------------------------------
-;; Helpers
+;; Helpers - aqui variables privadas solo para este namespace - para facilitar asignar clases o crear botones
 ;; ---------------------------------------------------------------------------
 
 (def ^:private status-cfg
