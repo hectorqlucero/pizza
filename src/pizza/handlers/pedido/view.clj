@@ -230,6 +230,16 @@
   (let [cambio (:cambio pedido 0)
         tipo   (:tipo pedido)]
     [:div.container.mt-4
+     [:style "@media print {
+       .no-print { display:none !important; }
+       nav, .navbar { display:none !important; }
+       .card { border:none !important; box-shadow:none !important; }
+       .card-header { background:#000 !important; color:#fff !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+       body { margin:0 !important; padding:0 !important; }
+       .container, .container-fluid { max-width:100% !important; padding:0 !important; margin:0 !important; }
+       div[style*='height: 70px'] { display:none !important; }
+       div[style*='margin-top:32px'] { margin-top:0 !important; max-height:none !important; overflow:visible !important; }
+     }"]
      [:div.card.shadow-lg
       [:div.card-header.bg-success.text-white
        [:div.d-flex.justify-content-between.align-items-center
@@ -274,7 +284,7 @@
           {:class (if (>= cambio 0) "text-success" "text-danger")}
           (format "$%.2f" (double cambio))]]]]
 
-      [:div.card-footer.d-flex.gap-2
+      [:div.card-footer.no-print.d-flex.gap-2
        [:a.btn.btn-primary {:href "/pedido"}
         [:i.bi.bi-telephone.me-1] "Nuevo Pedido"]
        [:a.btn.btn-secondary {:href "/despacho"}
