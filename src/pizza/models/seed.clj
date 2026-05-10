@@ -69,10 +69,39 @@
   :ok)
 
 ;; ---------------------------------------------------------------------------
+;; Repartidores de ejemplo
+;; ---------------------------------------------------------------------------
+
+(def repartidores-ejemplo
+  [{:nombre "Carlos Méndez" :telefono "555-101-0001" :activo "T"}
+   {:nombre "Laura Gómez"   :telefono "555-101-0002" :activo "T"}
+   {:nombre "Miguel Ríos"   :telefono "555-101-0003" :activo "T"}])
+
+(defn seed-repartidores!
+  "Inserta los repartidores de ejemplo si la tabla está vacía."
+  []
+  (let [existing (Query db ["SELECT COUNT(*) AS cnt FROM repartidores"])]
+    (if (pos? (-> existing first :cnt))
+      (do (println "⚠  La tabla repartidores ya tiene datos. No se insertó nada.")
+          :already-seeded)
+      (do (Insert-multi db :repartidores repartidores-ejemplo)
+          (println (str "✓  Se insertaron " (count repartidores-ejemplo) " repartidores de ejemplo."))
+          :ok))))
+
+(defn reset-y-seed-repartidores!
+  "⚠ DESTRUCTIVO — borra todos los repartidores e inserta los de ejemplo."
+  []
+  (pizza.models.crud/Query! db ["DELETE FROM repartidores"])
+  (Insert-multi db :repartidores repartidores-ejemplo)
+  (println (str "✓  Reset completo. " (count repartidores-ejemplo) " repartidores insertados."))
+  :ok)
+
+;; ---------------------------------------------------------------------------
 ;; Ejecución manual desde el REPL
 ;; ---------------------------------------------------------------------------
 
 (comment
+  ;; ── Productos ────────────────────────────────────────────────────────────
   ;; Insertar solo si la tabla está vacía:
   (seed-productos!)
 
@@ -80,4 +109,11 @@
   (reset-y-seed-productos!)
 
   ;; Ver qué hay actualmente en la tabla:
-  (Query db ["SELECT * FROM productos ORDER BY categoria, nombre"]))
+  (Query db ["SELECT * FROM productos ORDER BY categoria, nombre"])
+
+  ;; ── Repartidores ─────────────────────────────────────────────────────────
+  (seed-repartidores!)
+
+  (reset-y-seed-repartidores!)
+
+  (Query db ["SELECT * FROM repartidores ORDER BY nombre"]))
