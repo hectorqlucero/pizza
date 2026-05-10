@@ -64,6 +64,9 @@
          (advance-btn (:id p) "entregado" "✓ Entregado" "success"))
        (when-not (#{"en_ruta" "entregado" "cancelado"} status)
          (cancel-btn (:id p)))
+       [:a.btn.btn-sm.btn-outline-secondary
+        {:href (str "/pedido/recibo/" (:id p)) :target "_blank"}
+        [:i.bi.bi-receipt.me-1] "Ver"]
        (when (:repartidor_nombre p)
          [:span.badge.bg-secondary.align-self-center
           [:i.bi.bi-bicycle.me-1] (:repartidor_nombre p)])]]]))

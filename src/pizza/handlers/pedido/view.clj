@@ -72,36 +72,67 @@
                             :placeholder "Frente a la farmacia, portón azul..."}]]]]])
 
 ;; ---------------------------------------------------------------------------
-;; Grid de productos agrupados por categoria
+;; Grid de productos agrupados por categoria — con pestañas y tarjetas
 ;; ---------------------------------------------------------------------------
 
-(defn- producto-row [p]
+(defn- cat-slug [cat]
+  (str/replace (str/lower-case (str cat)) #"[^a-z0-9]" "-"))
+
+(defn- producto-card [p]
   [:div.col-6.col-md-4.col-lg-3
-   [:div.input-group.input-group-sm.mb-2
-    [:span.input-group-text.text-truncate.flex-grow-1
-     {:title (:nombre p) :style "max-width:130px;"}
-     (:nombre p)]
-    [:span.input-group-text.text-success.fw-bold
-     (str "$" (format "%.0f" (double (:precio p))))]
-    [:input.form-control.text-center.qty-input
-     {:type        "number"
-      :name        (str "qty-" (:id p))
-      :value       "0"
-      :min         "0"
-      :max         "99"
-      :style       "max-width:54px;"
-      :data-precio (str (:precio p))
-      :onchange    "calcularTotal()"}]]])
+   [:div.card.h-100.shadow-sm.text-center
+    [:div.card-body.p-2.d-flex.flex-column.justify-content-between
+     [:div.fw-semibold.mb-2
+      {:style "font-size:0.9rem; line-height:1.3;"}
+      (:nombre p)]
+     [:div
+      [:div.text-success.fw-bold.fs-5.mb-2
+       (str "$" (format "%.0f" (double (:precio p))))]
+      [:div.d-flex.justify-content-center.align-items-center.gap-1
+       [:button.btn.btn-outline-secondary.btn-sm
+        {:type    "button"
+         :onclick (str "adjQty('qty-" (:id p) "',-1)")}
+        "−"]
+       [:input.form-control.form-control-sm.text-center.qty-input
+        {:type        "number"
+         :name        (str "qty-" (:id p))
+         :value       "0"
+         :min         "0"
+         :max         "99"
+         :style       "width:52px;"
+         :data-precio (str (:precio p))
+         :onchange    "calcularTotal()"}]
+       [:button.btn.btn-outline-primary.btn-sm
+        {:type    "button"
+         :onclick (str "adjQty('qty-" (:id p) "',1)")}
+        "+"]]]]]])
 
 (defn- productos-section [productos]
-  (let [grouped (group-by :categoria productos)]
+  (let [grouped   (group-by :categoria productos)
+        cats      (sort (keys grouped))
+        first-cat (first cats)]
     [:div.mb-3
-     (for [[cat prods] (sort-by first grouped)]
-       [:div.mb-3 {:key cat}
-        [:h6.fw-bold.text-muted.border-bottom.pb-1
-         [:i.bi.bi-grid.me-1] cat]
-        [:div.row.g-1
-         (map producto-row prods)]])]))
+     ;; Pestañas por categoría
+     [:ul.nav.nav-pills.mb-3.flex-wrap {:id "cat-tabs" :role "tablist"}
+      (for [cat cats]
+        [:li.nav-item {:role "presentation"}
+         [:button
+          {:type           "button"
+           :role           "tab"
+           :class          (if (= cat first-cat) "nav-link active" "nav-link")
+           :data-bs-toggle "pill"
+           :data-bs-target (str "#cat-" (cat-slug cat))
+           :aria-selected  (str (= cat first-cat))}
+          cat]])]
+     ;; Contenido de cada pestaña
+     [:div.tab-content
+      (for [cat cats]
+        [:div
+         {:id    (str "cat-" (cat-slug cat))
+          :role  "tabpanel"
+          :class (if (= cat first-cat) "tab-pane fade show active" "tab-pane fade")}
+         [:div.row.g-2
+          (map producto-card (get grouped cat))]])]]))
 
 ;; ---------------------------------------------------------------------------
 ;; Forma de orden completa
@@ -109,80 +140,87 @@
 
 (defn orden-view [{:keys [cliente telefono productos]}]
   (let [no-productos? (empty? productos)]
-    [:div.container-fluid.mt-3
+    [:div.container-fluid
      [:form#pedido-form {:method "POST" :action "/pedido/guardar"}
       (anti-forgery-field)
+      [:input {:type "hidden" :name "total" :id "total-hidden" :value "0"}]
 
-      ;; Customer
-      [:div.row.mb-3
-       [:div.col-12
-        [:div.card.shadow-sm
-         [:div.card-header.bg-secondary.text-white.fw-bold
-          [:i.bi.bi-person.me-2] "Cliente"]
-         [:div.card-body
+      [:div.row.g-2.mb-5
+
+       ;; ── Columna izquierda: cliente + productos ──────────────────────────
+       [:div.col-lg-8
+
+        [:div.card.shadow-sm.mb-2
+         [:div.card-header.bg-secondary.text-white.fw-bold.py-1
+          [:i.bi.bi-person.me-1] "Cliente"]
+         [:div.card-body.py-2
           (if cliente
             (cliente-encontrado cliente)
-            (nuevo-cliente-form telefono))]]]]
+            (nuevo-cliente-form telefono))]]
 
-      ;; Products
-      [:div.row.mb-3
-       [:div.col-12
         [:div.card.shadow-sm
-         [:div.card-header.bg-secondary.text-white.fw-bold
-          [:i.bi.bi-grid.me-2] "Productos"]
-         [:div.card-body
+         [:div.card-header.bg-secondary.text-white.fw-bold.py-1
+          [:i.bi.bi-grid.me-1] "Productos"]
+         [:div.card-body.p-2
           (if no-productos?
-            [:div.alert.alert-warning
+            [:div.alert.alert-warning.m-2
              "No hay productos activos. Agréguelos en el catálogo de Productos."]
-            (productos-section productos))]]]]
+            (productos-section productos))]]]
 
-      ;; Order details
-      [:div.row.g-3.mb-4
-       [:div.col-md-4
-        [:label.form-label.fw-bold "Tipo de entrega"]
+       ;; ── Columna derecha: entrega + pago + notas ────────────────────────
+       [:div.col-lg-4
+
+        [:div.card.shadow-sm.mb-2
+         [:div.card-header.bg-secondary.text-white.fw-bold.py-1
+          [:i.bi.bi-truck.me-1] "Entrega"]
+         [:div.card-body.py-2
+          [:div.form-check
+           [:input.form-check-input {:type "radio" :name "tipo" :id "t1"
+                                     :value "domicilio" :checked true}]
+           [:label.form-check-label {:for "t1"} [:i.bi.bi-house.me-1] "A domicilio"]]
+          [:div.form-check
+           [:input.form-check-input {:type "radio" :name "tipo" :id "t2"
+                                     :value "recoger"}]
+           [:label.form-check-label {:for "t2"} [:i.bi.bi-shop.me-1] "Recoger en tienda"]]]]
+
+        [:div.card.shadow-sm.mb-2
+         [:div.card-header.bg-secondary.text-white.fw-bold.py-1
+          [:i.bi.bi-cash.me-1] "Pago"]
+         [:div.card-body.py-2
+          [:label.form-label.fw-semibold.small {:for "paga-con"} "¿Con cuánto paga?"]
+          [:div.input-group
+           [:span.input-group-text "$"]
+           [:input.form-control.form-control-lg
+            {:id "paga-con" :type "number" :name "paga_con" :value "0" :min "0" :step "1"
+             :onchange "calcularCambio()" :oninput "calcularCambio()"}]]]]
+
+        [:div.card.shadow-sm
+         [:div.card-header.bg-secondary.text-white.fw-bold.py-1
+          [:i.bi.bi-chat-left-text.me-1] "Notas"]
+         [:div.card-body.py-2
+          [:input.form-control {:type "text" :name "notas"
+                                :placeholder "Sin jalapeños, extra queso..."}]]]]]
+
+      ;; ── Barra fija abajo: total + cambio + guardar ─────────────────────
+      [:div
+       {:style (str "position:fixed; bottom:0; left:0; right:0; z-index:1040;"
+                    "background:#212529; color:#fff;"
+                    "padding:0.5rem 1.5rem;"
+                    "display:flex; align-items:center; justify-content:space-between; gap:1rem;"
+                    "box-shadow:0 -2px 8px rgba(0,0,0,0.3);")}
+       [:div.d-flex.gap-4.align-items-center
         [:div
-         [:div.form-check.form-check-inline
-          [:input.form-check-input {:type "radio" :name "tipo" :id "t1"
-                                    :value "domicilio" :checked true}]
-          [:label.form-check-label {:for "t1"}
-           [:i.bi.bi-house.me-1] "A domicilio"]]
-         [:div.form-check.form-check-inline
-          [:input.form-check-input {:type "radio" :name "tipo" :id "t2"
-                                    :value "recoger"}]
-          [:label.form-check-label {:for "t2"}
-           [:i.bi.bi-shop.me-1] "Recoger en tienda"]]]]
-
-       [:div.col-md-4
-        [:label.form-label.fw-bold {:for "paga-con"} "¿Con cuánto paga?"]
-        [:div.input-group
-         [:span.input-group-text "$"]
-         [:input.form-control.form-control-lg
-          {:id "paga-con" :type "number" :name "paga_con" :value "0" :min "0" :step "1"
-           :onchange "calcularCambio()" :oninput "calcularCambio()"}]]]
-
-       [:div.col-md-4
-        [:label.form-label.fw-bold "Notas"]
-        [:input.form-control {:type "text" :name "notas"
-                              :placeholder "Sin jalapeños, extra queso..."}]]]
-
-      ;; Total + change bar
-      [:div.card.bg-dark.text-white.mb-4
-       [:div.card-body.d-flex.justify-content-between.align-items-center.flex-wrap.gap-3
+         [:div {:style "font-size:0.7rem; color:#adb5bd;"} "TOTAL"]
+         [:div.fw-bold.fs-4 {:id "total-display"} "$0.00"]]
         [:div
-         [:div.text-muted.small "TOTAL DEL PEDIDO"]
-         [:div.display-5.fw-bold {:id "total-display"} "$0.00"]]
-        [:div.text-center
-         [:div.text-muted.small "CAMBIO A DAR"]
-         [:div.display-5.fw-bold {:id "cambio-display"} "$0.00"]]
-        [:div
-         [:input {:type "hidden" :name "total" :id "total-hidden" :value "0"}]
-         [:button.btn.btn-success.btn-lg.px-5
-          {:type "submit"}
-          [:i.bi.bi-check-circle.me-2] "Guardar Pedido"]]]]
-
-      ;; Back
-      [:a.btn.btn-outline-secondary {:href "/pedido"}
-       [:i.bi.bi-arrow-left.me-1] "Nueva búsqueda"]]]))
+         [:div {:style "font-size:0.7rem; color:#adb5bd;"} "CAMBIO"]
+         [:div.fw-bold.fs-4 {:id "cambio-display"} "$0.00"]]]
+       [:div.d-flex.gap-2.align-items-center
+        [:a.btn.btn-outline-light.btn-sm {:href "/pedido"}
+         [:i.bi.bi-arrow-left.me-1] "Nueva búsqueda"]
+        [:button.btn.btn-success.btn-lg.px-4
+         {:type "submit"}
+         [:i.bi.bi-check-circle.me-2] "Guardar Pedido"]]]]]))
 
 ;; ---------------------------------------------------------------------------
 ;; Recibo
@@ -240,7 +278,10 @@
        [:a.btn.btn-primary {:href "/pedido"}
         [:i.bi.bi-telephone.me-1] "Nuevo Pedido"]
        [:a.btn.btn-secondary {:href "/despacho"}
-        [:i.bi.bi-truck.me-1] "Ir a Despacho"]]]]))
+        [:i.bi.bi-truck.me-1] "Ir a Despacho"]
+       [:button.btn.btn-outline-dark
+        {:type "button" :onclick "window.print()"}
+        [:i.bi.bi-printer.me-1] "Imprimir"]]]]))
 
 ;; ---------------------------------------------------------------------------
 ;; JS: total + change calculador - calcular la feria del billete con lo que pago el cliente
@@ -248,7 +289,12 @@
 
 (defn orden-js []
   [:script
-   "function calcularTotal(){
+   "function adjQty(name, delta) {
+      var el = document.querySelector('input[name=\"' + name + '\"]');
+      el.value = Math.max(0, Math.min(99, (parseInt(el.value, 10) || 0) + delta));
+      calcularTotal();
+    }
+    function calcularTotal(){
       var t=0;
       document.querySelectorAll('.qty-input').forEach(function(el){
         t += (parseInt(el.value,10)||0) * (parseFloat(el.dataset.precio)||0);
