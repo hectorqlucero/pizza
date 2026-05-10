@@ -75,9 +75,6 @@
 ;; Grid de productos agrupados por categoria — con pestañas y tarjetas
 ;; ---------------------------------------------------------------------------
 
-(defn- cat-slug [cat]
-  (str/replace (str/lower-case (str cat)) #"[^a-z0-9]" "-"))
-
 (defn- producto-card [p]
   [:div.col-6.col-md-4.col-lg-3
    [:div.card.h-100.shadow-sm.text-center
@@ -110,29 +107,26 @@
 (defn- productos-section [productos]
   (let [grouped   (group-by :categoria productos)
         cats      (sort (keys grouped))
-        first-cat (first cats)]
+        first-cat (first cats)
+        n         (count cats)
+        indexed   (map-indexed vector cats)]
     [:div.mb-3
-     ;; Pestañas por categoría
-     [:ul.nav.nav-pills.mb-3.flex-wrap {:id "cat-tabs" :role "tablist"}
-      (for [cat cats]
-        [:li.nav-item {:role "presentation"}
-         [:button
-          {:type           "button"
-           :role           "tab"
-           :class          (if (= cat first-cat) "nav-link active" "nav-link")
-           :data-bs-toggle "pill"
-           :data-bs-target (str "#cat-" (cat-slug cat))
-           :aria-selected  (str (= cat first-cat))}
-          cat]])]
-     ;; Contenido de cada pestaña
-     [:div.tab-content
-      (for [cat cats]
-        [:div
-         {:id    (str "cat-" (cat-slug cat))
-          :role  "tabpanel"
-          :class (if (= cat first-cat) "tab-pane fade show active" "tab-pane fade")}
-         [:div.row.g-2
-          (map producto-card (get grouped cat))]])]]))
+     ;; Botones de categoría — JS propio, sin Bootstrap tabs
+     [:div.d-flex.flex-wrap.gap-2.mb-3
+      (for [[i cat] indexed]
+        [:button
+         {:type    "button"
+          :id      (str "btn-cat-" i)
+          :class   (if (= cat first-cat) "btn btn-primary btn-sm" "btn btn-outline-secondary btn-sm")
+          :onclick (str "showCat(" i "," n ")")}
+         cat])]
+     ;; Paneles de productos
+     (for [[i cat] indexed]
+       [:div
+        {:id    (str "cat-pane-" i)
+         :style (if (= cat first-cat) "display:block;" "display:none;")}
+        [:div.row.g-2
+         (map producto-card (get grouped cat))]])]))
 
 ;; ---------------------------------------------------------------------------
 ;; Forma de orden completa
@@ -299,7 +293,15 @@
 
 (defn orden-js []
   [:script
-   "function adjQty(name, delta) {
+   "function showCat(idx, total) {
+      for (var j = 0; j < total; j++) {
+        var pane = document.getElementById('cat-pane-' + j);
+        var btn  = document.getElementById('btn-cat-' + j);
+        if (pane) pane.style.display = (j === idx) ? 'block' : 'none';
+        if (btn)  btn.className = (j === idx) ? 'btn btn-primary btn-sm' : 'btn btn-outline-secondary btn-sm';
+      }
+    }
+    function adjQty(name, delta) {
       var el = document.querySelector('input[name=\"' + name + '\"]');
       el.value = Math.max(0, Math.min(99, (parseInt(el.value, 10) || 0) + delta));
       calcularTotal();
